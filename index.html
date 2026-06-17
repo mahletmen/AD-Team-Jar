@@ -374,10 +374,8 @@ async function addMemory() {
     founding: isFoundingDrop()
   };
   try {
-    const res = await fetch(API, {
-      method:'POST',
-      body: JSON.stringify({action:'add', memory:m})
-    });
+    const params = new URLSearchParams({ action: 'add', memory: JSON.stringify(m) });
+    const res = await fetch(`${API}?${params}`);
     const json = await res.json();
     if (json.success) {
       memories.unshift(m);
@@ -394,14 +392,13 @@ async function saveEdit(id) {
   const area = document.getElementById('edit-' + id);
   const newText = area ? area.value.trim() : '';
   if (!newText) { showToast('The memory can\'t be empty'); return; }
+  const m = memories.find(m => String(m.id) === String(id));
+  const cat = m ? m.cat : selectedCat;
   try {
-    const res = await fetch(API, {
-      method:'POST',
-      body: JSON.stringify({action:'edit', id: String(id), text: newText, cat: selectedCat})
-    });
+    const params = new URLSearchParams({ action: 'edit', id: String(id), text: newText, cat });
+    const res = await fetch(`${API}?${params}`);
     const json = await res.json();
     if (json.success) {
-      const m = memories.find(m => String(m.id) === String(id));
       if (m) m.text = newText;
       editingId = null;
       renderList();
@@ -413,10 +410,8 @@ async function saveEdit(id) {
 async function deleteMemory(id) {
   if (!confirm('Remove this memory from the jar?')) return;
   try {
-    const res = await fetch(API, {
-      method:'POST',
-      body: JSON.stringify({action:'delete', id: String(id)})
-    });
+    const params = new URLSearchParams({ action: 'delete', id: String(id) });
+    const res = await fetch(`${API}?${params}`);
     const json = await res.json();
     if (json.success) {
       memories = memories.filter(m => String(m.id) !== String(id));
